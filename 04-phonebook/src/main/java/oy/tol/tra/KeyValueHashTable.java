@@ -22,7 +22,7 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
 
     @Override
     public Type getType() {
-        return Type.NONE;
+        return Type.HASHTABLE;
     }
 
     @SuppressWarnings("unchecked")
@@ -41,8 +41,7 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
 
     @Override
     public int size() {
-        // TODO: Implement this.
-        return 0;
+        return count;
     }
 
     /**
@@ -70,28 +69,54 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
 
     @Override
     public boolean add(K key, V value) throws IllegalArgumentException, OutOfMemoryError {
-        // TODO: Implement this.
-        // Remeber to check for null values.
-
-        // Checks if the LOAD_FACTOR has been exceeded --> if so, reallocates to a bigger hashtable.
-        if (((double)count * (1.0 + LOAD_FACTOR)) >= values.length) {
-            reallocate((int)((double)(values.length) * (1.0 / LOAD_FACTOR)));
+        // 检查空值
+        if (key == null || value == null) {
+            throw new IllegalArgumentException("Key and value cannot be null");
         }
-        // Remember to get the hash key from the Person,
-        // hash table computes the index for the Person (based on the hash value),
-        // if index was taken by different Person (collision), get new hash and index,
-        // insert into table when the index has a null in it,
-        // return true if existing Person updated or new Person inserted.
-        
-        return false;
+
+        // 检查是否需要重新分配内存
+        if (((double) count / values.length) >= LOAD_FACTOR) {
+            reallocate(values.length * 2); // 重新分配内存为原来的两倍
+        }
+
+        int hash = key.hashCode();
+        int index = (hash & 0x7FFFFFFF) % values.length; // 使用 & 0x7FFFFFFF 来确保索引为非负值
+
+        int step = 1;
+        while (values[index] != null) {
+            if (values[index].getKey().equals(key)) { // 如果键已存在，则更新值
+                values[index].setValue(value);
+                return true;
+            }
+            index = (index + step * step) % values.length; // 平方探测
+            step++;
+        }
+
+        // 插入新键值对
+        values[index] = new Pair<>(key, value);
+        count++;
+        return true;
     }
 
     @Override
     public V find(K key) throws IllegalArgumentException {
-        // Remember to check for null.
+        // 检查空值
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null");
+        }
 
-        // Must use same method for computing index as add method
-        
+        int hash = key.hashCode();
+        int index = (hash & 0x7FFFFFFF) % values.length;
+
+        int step = 1;
+        while (values[index] != null) {
+            if (values[index].getKey().equals(key)) {
+                return values[index].getValue();
+            }
+            index = (index + step * step) % values.length;
+            step++;
+        }
+
         return null;
     }
 
@@ -101,13 +126,13 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
         Pair<K, V> [] sorted = (Pair<K,V>[])new Pair[count];
         int newIndex = 0;
         for (int index = 0; index < values.length; index++) {
-           if (values[index] != null) {
-              sorted[newIndex++] = new Pair<>(values[index].getKey(), values[index].getValue());
-           }
+            if (values[index] != null) {
+                sorted[newIndex++] = new Pair<>(values[index].getKey(), values[index].getValue());
+            }
         }
         Algorithms.fastSort(sorted);
         return sorted;
-      }
+    }
 
     @SuppressWarnings("unchecked")
     private void reallocate(int newSize) throws OutOfMemoryError {
@@ -130,9 +155,9 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
     @Override
     public void compress() throws OutOfMemoryError {
         int newCapacity = (int)(count * (1.0 / LOAD_FACTOR));
-		    if (newCapacity < values.length) {
-			      reallocate(newCapacity);
-		    } 
+        if (newCapacity < values.length) {
+            reallocate(newCapacity);
+        }
     }
- 
+
 }
