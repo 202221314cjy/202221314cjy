@@ -1,6 +1,5 @@
 package oy.tol.tra;
 
-
 public class Person implements Comparable<Person> {
     private String firstName;
     private String lastName;
@@ -40,14 +39,11 @@ public class Person implements Comparable<Person> {
      */
     @Override
     public int hashCode() {
-        int hash = 5381;
-        for(char c:firstName.toCharArray()){
-            hash += c;
+        int hash = 31;
+        String fallName = getFullName();
+        for (int i=0;i<fallName.length();i++){
+            hash = (hash*31+fallName.charAt(i));
         }
-        for(char c:lastName.toCharArray()){
-            hash += c;
-        }
-        // Implement hash function here.
         return hash;
     }
 

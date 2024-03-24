@@ -1,58 +1,48 @@
 package oy.tol.tra;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.function.Predicate;
 
+import java.util.Comparator;
+
 public class Algorithms {
-    private Integer [] array = null;
-    /**
-     * The method to reverse the internal Java int array.
-     */
-    public static <T extends Comparable<T>> void reverse(T[] array) {
-        int length = array.length;
-        for(int i = 0; i < length/2; i++){
-            T temp = array[i];
-            array[i] = array[length-1-i];
-            array[length-1-i] = temp;
+    //Generic methods
+
+    public static <T> void reverse(T [] array){
+        int l=0;
+        int r=array.length-1;
+        while(l<r){
+            swap(array,l,r);
+            l++;
+            r--;
         }
     }
+    public static <T extends Comparable<T>> void sort(T [] array){
 
-    /**
-     * Sorts the array to ascending order.
-     */
-    public static <T extends Comparable<T>> void sort(T[] array) {
-        int length = array.length;
-        for(int i = 0; i < length; i++){
-            for(int j = 0; j < length-1-i; j++){
-                T x1 = array[j];
-                T x2 = array[j+1];
-                if(x1.compareTo(x2) > 0){
-                    array[j+1] = x1;
-                    array[j] = x2;
+        for (int i=0; i < array.length-1; i++) {
+            for (int j = 0; j < array.length-i-1; j++) {
+                if(array[j].compareTo(array[j+1])>0){
+                    swap(array, j, j+1);
                 }
             }
         }
     }
 
+    public static <E extends Comparable<E>> int binarySearch(E aValue, E[] fromArray, int fromIndex, int toIndex) {
+        while (fromIndex <= toIndex) {
+            int mid = (fromIndex + toIndex) / 2;//Calculate intermediate index
 
-    public static <T extends Comparable<T>> int binarySearch(T aValue, T [] fromArray, int fromIndex, int toIndex) {
-        // TODO: you will implement this in step 2 below.
-        if (aValue.compareTo(fromArray[fromIndex]) < 0 || aValue.compareTo(fromArray[toIndex]) > 0) {
-            return -1;
-        }
-        // 找中间值
-        int mid = (fromIndex + toIndex) / 2;
 
-        if (fromArray[mid].equals(aValue)) {
-            return mid;
-        } else if (fromArray[mid].compareTo(aValue) > 0) {
-            //如果中间值大于要找的值则从左边一半继续递归
-            return binarySearch(aValue, fromArray, fromIndex, mid-1);
-        } else {
-            //如果中间值小于要找的值则从右边一半继续递归
-            return binarySearch(aValue, fromArray, mid + 1, toIndex);
+            int cmp = aValue.compareTo(fromArray[mid]);//Comparison with median
+            if (cmp == 0) {
+                return mid;//Find the target value and return the index
+            } else if (cmp < 0) {
+                toIndex = mid - 1;//Target value on the left, update end index
+            } else {
+                fromIndex = mid + 1;//Target value on the right, update starting index
+            }
         }
+        return -1;
     }
 
     //QuickSort
@@ -64,14 +54,15 @@ public class Algorithms {
         if(begin>=end){
             return;
         }
-        int pivot=partition(array, begin, end);
-        quickSort(array, begin, pivot-1);
-        quickSort(array, pivot+1, end);
+        int p=partition(array, begin, end);
+        quickSort(array, begin, p-1);
+        quickSort(array, p+1, end);
     }
-    private static <E extends Comparable<E>> int partition(E [] array, int begin, int end) {
-        E p=array[begin];
+    private static <T extends Comparable<T>> int partition(T [] array, int begin, int end) {
         int left=begin;
         int right=end;
+        T p=array[begin];
+
         while(left!=right){
             while ((left<right)&&array[right].compareTo(p)>0) {
                 right--;
@@ -80,9 +71,7 @@ public class Algorithms {
                 left++;
             }
             if(left<right){
-                E tmp = array[left];
-                array[left]=array[right];
-                array[right] = tmp;
+                swap(array, left, right);
             }
         }
         array[begin]=array[left];
@@ -96,27 +85,31 @@ public class Algorithms {
         int right = count - 1;
 
         while (left <= right) {
+            //Move the left pointer until an element that does not meet the condition is found
             while (left <= right && !judgeNullPredicate.test(pairs[left])) {
                 left++;
             }
-
-            while (left <= right && judgeNullPredicate.test(pairs[right])) {
+            //Move the right pointer until an element that meets the condition is found
+            while (right >= left && judgeNullPredicate.test(pairs[right])) {
                 right--;
             }
-
+            //Exchange elements that satisfy and those that do not
             if (left < right) {
-                T tmp = pairs[left];
-                pairs[left]=pairs[right];
-                pairs[right] = tmp;
+                swap(pairs, left, right);
                 left++;
                 right--;
             }
         }
-        return left;
+        return left;//Return Left Pointer Position
 
     }
     //TODO: this is for a test,need to be written by youself
     public static <T> void sortWithComparator( T[] array, Comparator<? super T> comparator) {
         Arrays.sort(array, comparator);
+    }
+    public static <E>void swap(E[] array,int m,int n){
+        E tmp=array[m];
+        array[m]=array[n];
+        array[n]=tmp;
     }
 }

@@ -1,5 +1,7 @@
 package oy.tol.tra;
 
+import java.net.HttpURLConnection;
+
 public class KeyValueBSearchTree<K extends Comparable<K>, V> implements Dictionary<K, V> {
 
     // This is the BST implementation, KeyValueHashTable has the hash table
@@ -16,6 +18,7 @@ public class KeyValueBSearchTree<K extends Comparable<K>, V> implements Dictiona
 
     @Override
     public int size() {
+        // TODO: Implement this
         return count;
     }
 
@@ -49,33 +52,32 @@ public class KeyValueBSearchTree<K extends Comparable<K>, V> implements Dictiona
     public boolean add(K key, V value) throws IllegalArgumentException, OutOfMemoryError {
         // TODO: Implement this
         // Remember null check.
-        if(key==null||value==null){
-            throw new IllegalArgumentException("the key and value can not be null");
-        }
-        int result=0;
         // If root is null, should go there.
-        if(root==null){
-            root=new TreeNode<K,V>(key, value);
+        if (null==key || value==null) throw new IllegalArgumentException("Person or phone number cannot be null");
+        if (root == null){
+            root = new TreeNode<>(key,value);
             count++;
-        }else{
-            result=root.insert(key, value, key.hashCode());
+            return true;
+        }
+        int added = root.insert(key,value,key.hashCode());
+        if (TreeNode.currentAddTreeDepth>maxTreeDepth){
+            maxTreeDepth = TreeNode.currentAddTreeDepth;
         }
         // update the root node. But it may have children
         // so do not just replace it with this new node but set
         // the keys and values for the already existing root.
-
-        if(result==1){
+        TreeNode.currentAddTreeDepth = 0;
+        if (added == 1){
             count++;
-        }
-        return true;
+            return true;
+        }else return false;
     }
 
     @Override
     public V find(K key) throws IllegalArgumentException {
-        if(key==null){
-            throw new IllegalArgumentException("the key can not be null");
-        }
-        return root.find(key, key.hashCode());
+        // TODO: Implement this. //Think about this
+        if (null == key) throw new IllegalArgumentException("Person to find cannot be null");
+        return (root.find(key,key.hashCode()));
     }
 
     @Override
