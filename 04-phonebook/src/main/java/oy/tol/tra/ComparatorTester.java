@@ -26,7 +26,10 @@ public class ComparatorTester {
 		new Person("Atte", "Aurinkoinen"),
 		new Person("Simo", "Hiltunen"),
 		new Person("Heikki", "Iivari")};
-
+		Algorithms.sortWithComparator(array, new AscendingPersonComparator());
+		System.out.println(Arrays.toString(array));
+		Algorithms.sortWithComparator(array, new DescendingPersonComparator());
+		System.out.println(Arrays.toString(array));
 
 	}
 
