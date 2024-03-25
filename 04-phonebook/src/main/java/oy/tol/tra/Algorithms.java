@@ -58,50 +58,54 @@ public class Algorithms {
         quickSort(array, begin, p-1);
         quickSort(array, p+1, end);
     }
-    private static <T extends Comparable<T>> int partition(T [] array, int begin, int end) {
-        int left=begin;
-        int right=end;
-        T p=array[begin];
-
-        while(left!=right){
-            while ((left<right)&&array[right].compareTo(p)>0) {
-                right--;
-            }
-            while ((left<right)&&array[left].compareTo(p)<=0) {
-                left++;
-            }
-            if(left<right){
-                swap(array, left, right);
-            }
-        }
-        array[begin]=array[left];
-        array[left]=p;
-        return left;
-    }
 
 
-    public static <T> int partitionByRule(T [] pairs,int count,Predicate<T> judgeNullPredicate){
-        int left = 0;
-        int right = count - 1;
+    public static <T> int partitionByRule(T [] pairs,int count,Predicate<T> judge){
+        int l = 0;
+        int r = count - 1;
 
-        while (left <= right) {
+        while (l <= r) {
             //Move the left pointer until an element that does not meet the condition is found
-            while (left <= right && !judgeNullPredicate.test(pairs[left])) {
-                left++;
+            while (l <= r && !judge.test(pairs[l])) {
+                l++;
             }
             //Move the right pointer until an element that meets the condition is found
-            while (right >= left && judgeNullPredicate.test(pairs[right])) {
-                right--;
+            while (r >= l && judge.test(pairs[r])) {
+                r--;
             }
             //Exchange elements that satisfy and those that do not
-            if (left < right) {
-                swap(pairs, left, right);
-                left++;
-                right--;
+            if (l < r) {
+                swap(pairs, l, r);
+                l++;
+                r--;
             }
         }
-        return left;//Return Left Pointer Position
+        return l;//Return Left Pointer Position
 
+    }
+    private static <T extends Comparable<T>> int partition(T [] array, int begin, int end) {
+        int l=begin;
+        int r=end;
+        T p=array[begin];
+        //Loop until the left and right pointers meet
+        while(l!=r){
+            //Starting from the right side, find the position of the first element smaller than the baseline element
+            while ((l<r)&&array[r].compareTo(p)>0) {
+                r--;
+            }
+            //Starting from the left, find the position of the first element that is greater than or equal to the baseline element
+            while ((l<r)&&array[l].compareTo(p)<=0) {
+                l++;
+            }
+            //If the left and right pointers have not yet met, swap the positions of the two elements
+            if(l<r){
+                swap(array, l, r);
+            }
+        }
+        //Place the reference element in its final position
+        array[begin]=array[l];
+        array[l]=p;
+        return l;
     }
     //TODO: this is for a test,need to be written by youself
     public static <T> void sortWithComparator( T[] array, Comparator<? super T> comparator) {

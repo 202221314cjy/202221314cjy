@@ -98,17 +98,6 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
         return true;
     }
 
-    private int calculateIndexByHC(int hashCode,K key){
-        int index = Math.abs(hashCode) % values.length;
-        int begin = index;
-        while (values[index] != null && !values[index].getKey().equals(key)) {
-            index = (index + 1) % values.length;
-            if (index == begin) {
-                return -1;
-            }
-        }
-        return index;
-    }
     @Override
     public V find(K key) throws IllegalArgumentException {
         // Remember to check for null.
@@ -175,5 +164,15 @@ public class KeyValueHashTable<K extends Comparable<K>, V> implements Dictionary
             reallocate(newCapacity);
         }
     }
-
+    private int calculateIndexByHC(int hashCode,K key){
+        int index = Math.abs(hashCode) % values.length;
+        int begin = index;
+        while (values[index] != null && !values[index].getKey().equals(key)) {
+            index = (index + 1) % values.length;
+            if (index == begin) {
+                return -1;
+            }
+        }
+        return index;
+    }
 }
