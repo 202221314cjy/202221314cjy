@@ -34,14 +34,18 @@ public class StackImplementation<E> implements StackInterface<E> {
     * @throws StackAllocationException If cannot allocate room for the internal array.
     */
    public StackImplementation(int capacity) throws StackAllocationException {
+      //Check if the stack capacity is less than 2, and if so, throw an exception
       if (capacity < 2) {
          throw new StackAllocationException("Capacity must be at least 2.");
       }
       try {
+         //Attempt to allocate an array of specified capacity size to store stack elements
          itemArray = new Object[capacity];
+         //Set the capacity of the stack
          this.capacity = capacity;
       } catch (Exception e) {
-         throw new StackAllocationException("Failed to allocate room for the internal array.");
+         //If allocation fails, throw an exception
+         throw new StackAllocationException("allocate failure");
       }
    }
 
@@ -53,19 +57,24 @@ public class StackImplementation<E> implements StackInterface<E> {
 
    @Override
    public void push(E element) throws StackAllocationException, NullPointerException {
+      //Check if the stack is full, and if it is, expand it
       // TODO: Implement this
       if (currentIndex == capacity - 1) {
          int newCapacity = capacity * EXTRA;
-         Object[] tempArray = new Object[newCapacity];
+         Object[] tempArray = new Object[newCapacity];//Create a temporary array to store expanded elements
+         //Copy elements from the original array to a temporary array
          for (int i = 0; i < currentIndex + 1; i++) {
             tempArray[i] = itemArray[i];
          }
+         //Point the reference to a new array and update the capacity
          itemArray = tempArray;
          capacity = newCapacity;
       }
       if (element == null) {
-         throw new NullPointerException("Cannot push null element to the stack.");
+         //Check if the element to be pushed onto the stack is null, and if so, throw an exception
+         throw new NullPointerException("The element pushed onto the stack cannot be null");
       }
+      //Increase the current index and push elements onto the stack
       currentIndex++;
       itemArray[currentIndex] = element;
    }
@@ -73,7 +82,7 @@ public class StackImplementation<E> implements StackInterface<E> {
    @Override
    public E pop() throws StackIsEmptyException {
       if (currentIndex == -1) {
-         throw new StackIsEmptyException("Stack is empty, cannot pop element.");
+         throw new StackIsEmptyException("Stack is empty");
       }
       E poppedElement = (E) itemArray[currentIndex];
       itemArray[currentIndex] = null;
@@ -85,7 +94,7 @@ public class StackImplementation<E> implements StackInterface<E> {
    @Override
    public E peek() throws StackIsEmptyException {
       if (currentIndex == -1) {
-         throw new StackIsEmptyException("Stack is empty, cannot peek element.");
+         throw new StackIsEmptyException("Stack is empty");
       }
       return (E) itemArray[currentIndex];
    }
@@ -115,12 +124,12 @@ public class StackImplementation<E> implements StackInterface<E> {
    public String toString() {
       StringBuilder builder = new StringBuilder("[");
       for (var index = 0; index <= currentIndex; index++) {
-         builder.append(itemArray[index].toString());
+         builder.append(itemArray[index].toString());//Convert elements to strings
          if (index < currentIndex) {
-            builder.append(", ");
+            builder.append(", ");//Add a comma separator, unless it is the last element
          }
       }
-      builder.append("]");
-      return builder.toString();
+      builder.append("]");//Adding right parentheses to indicate the end of the stack
+      return builder.toString();//return string
    }
 }
