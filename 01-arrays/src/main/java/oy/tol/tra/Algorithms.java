@@ -7,7 +7,7 @@ public class Algorithms {
         int start = 0;//Reverse starting position
         int end = arr.length - 1;//Reverse end Position
         while (start < end) {
-            method2(arr, start, end);//Using method2 for element exchange
+            method1(arr, start, end);//Using method2 for element exchange
             start++;//Update starting position
             end--;//Update end position
         }
@@ -29,9 +29,5 @@ public class Algorithms {
         }
     }
 
-    public static <E> void method2(E[] data, int index1, int index2) {
-        E tmp = data[index1];
-        data[index1] = data[index2];
-        data[index2] = tmp;
-    }
+
 }
