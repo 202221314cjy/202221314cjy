@@ -3,6 +3,8 @@ package oy.tol.tra;
 
 public class QueueImplementation<E> implements QueueInterface<E> {
     private int capacity;
+    private int head = 0;
+    private int tail = 0;
     private int size ;
     private Object[] ARRAY;
 
@@ -21,7 +23,67 @@ public class QueueImplementation<E> implements QueueInterface<E> {
     public int capacity() {
         return capacity;
     }
+    @Override
+    public void enqueue(E element) throws QueueAllocationException, NullPointerException {
+        if (element == null) {
+            throw new NullPointerException("element can not be null");
+        }
 
+        // Check if the queue is full and needs to expand
+        if (size >= capacity) {
+            try {
+                int newCapacity = 2 * capacity; // Double the capacity
+                Object[] newArray = new Object[newCapacity];
+                for (int i = 0; i < size; i++) {
+                    // Re-arrange elements considering wrap-around
+                    int index = head + i;
+                    if (index >= capacity) {
+                        index -= capacity; // Wrap around to the beginning of the array
+                    }
+                    newArray[i] = ARRAY[index];
+                }
+                ARRAY = newArray;
+                head = 0; // Reset head to the start of the new array
+                tail = size; // Set tail correctly in the new array
+                capacity = newCapacity; // Update capacity to the new size
+            } catch (OutOfMemoryError e) {
+                throw new QueueAllocationException("Failed to allocate more room for the queue.");
+            }
+        }
+
+        ARRAY[tail] = element; // Insert the element at the tail
+        if (tail == capacity - 1) {
+            tail = 0; // Wrap around to the beginning of the array
+        } else {
+            tail++; // Move tail pointer forward
+        }
+        size++; // Increment size
+    }
+    @Override
+    public E dequeue() throws QueueIsEmptyException {
+        if (size == 0) {//Check if the queue is empty
+            throw new QueueIsEmptyException("Queue is empty");
+        }
+
+        E dequeueElement = (E) ARRAY[head];//Get the element at the front
+        ARRAY[head] = null;//Remove the element by setting its position to null
+
+        head = head + 1;//Update the head pointer to the next element position
+        if (head == capacity) {
+            head = 0;
+        }//If the capacity is reached, loop it to the beginning of the queue
+        size--; //Decrease the size of the queue
+
+        return dequeueElement;
+    }
+    @Override
+    public E element() throws QueueIsEmptyException {
+        if (head == tail && size != capacity){
+            throw new QueueIsEmptyException("There's no data in the queue");
+        }
+        Object el = ARRAY[head];
+        return (E) el;
+    }
 
     @Override
     public int size() {
@@ -33,61 +95,31 @@ public class QueueImplementation<E> implements QueueInterface<E> {
     }
     @Override
     public void clear() {
-        for(int i = 0; i <size; i++){
+        for(int i = 0; i <capacity; i++){
             ARRAY[i] = null;
         }
         size = 0;
-    }
-
-
-    public E dequeue() throws QueueIsEmptyException {
-        if (isEmpty()) {//If the queue is empty
-            throw new QueueIsEmptyException("Queue is empty");
-        }
-        E element = (E) ARRAY[0];//Get the first element
-        for (int i = 0; i < size - 1; i++) {//Move the element forward by one position
-            ARRAY[i] = ARRAY[i + 1];
-        }
-        ARRAY[--size] = null;//Leave the last element blank
-        return element;
-
-    }
-
-
-    public E element() throws QueueIsEmptyException {
-        if (isEmpty()) { //If the queue is empty
-            throw new QueueIsEmptyException("There's no data in the queue");
-        }
-        return (E)ARRAY[0]; //Return the first element of the queue
-    }
-    public void enqueue(E element) throws QueueAllocationException, NullPointerException {
-        if (element == null) {
-            throw new NullPointerException("element can not be null");
-        }
-        if (size >= capacity) {
-            int newCapacity = capacity * 2;
-            Object[] newArray;
-            newArray = new Object[newCapacity];//Create a new array
-            for (int i = 0; i < size; i++) {
-                newArray[i] = ARRAY[i];//Copy the original array elements to the new array
-            }
-            ARRAY = newArray;
-            capacity = newCapacity;//Update queue capacity
-        }
-        ARRAY[size++] = element;//Add elements to the end of the queue
+        tail = 0;
+        head = 0;
     }
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        if (size > 0) {
-            sb.append(ARRAY[0]);//Add the first element to the string
-            for (int i = 1; i < size; i++) {
-                sb.append(", ");
-                sb.append(ARRAY[i]);//Add current element
+        StringBuilder builder = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            //Determine whether the element is at the head of the array
+            if (head + i < capacity) {
+                builder.append(ARRAY[head + i].toString());
+            } else {
+                //If not at the head, calculate the position of the element in the loop array
+                builder.append(ARRAY[i - (capacity - head)].toString());
+            }
+            //If it is not the last element, add commas and spaces
+            if (i < size - 1) {
+                builder.append(", ");
             }
         }
-        sb.append("]");//End concatenating string
-        return sb.toString();
+        //Add a right parenthesis at the end to return the concatenated string
+        builder.append("]");
+        return builder.toString();
     }
 }
