@@ -25,14 +25,14 @@ public class Algorithms {
         while (fromIndex <= toIndex) {
             int mid = fromIndex + (toIndex - fromIndex) / 2;
 
-            if (arr[mid].compareTo(key) == 0) {
+            if (arr[mid].compareTo(key) == 0) {//Found key value, return its index
                 return mid;
             } else if (arr[mid].compareTo(key) < 0) {
-                fromIndex = mid + 1;
-            } else {
+                fromIndex = mid + 1;//If the intermediate element is smaller than the key value, continue searching in the right half of the array
+            } else {//If the intermediate element is greater than the key value, continue searching in the left half of the array
                 toIndex = mid - 1;
             }
-        }
+        }//Key value does not exist in the array, return -1
         return -1;
     }
 
@@ -50,23 +50,26 @@ public class Algorithms {
 
     private static <E extends Comparable<E>> int partition(E[] array, int begin, int end) {
         E pivot = array[begin];
+        //Initialize two pointers i and j. I moves backwards from the position before the start of the array, and j moves forward from the position after the end of the array.
         int i = begin - 1;
         int j = end + 1;
-
+        //Infinite loop until all pairs of elements that need to be swapped are found
         while (true) {
+            //Move i until an element greater than or equal to pivot is found.
             do {
                 i++;
             } while (array[i].compareTo(pivot) < 0);
-
+            //Move j until an element less than or equal to pivot is found.
             do {
                 j--;
             } while (array[j].compareTo(pivot) > 0);
-
+            //If i>=j, it indicates that all pairs of elements that need to be exchanged have been processed, ending the loop.
             if (i >= j) {
                 return j;
             }
 
-            swap(array, i, j);
+            // Swap elements at indices i and j
+            swap(array, i, j );
         }
     }
 
