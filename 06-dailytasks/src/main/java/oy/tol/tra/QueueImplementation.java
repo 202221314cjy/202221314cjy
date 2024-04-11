@@ -5,19 +5,23 @@ public class QueueImplementation<E> implements QueueInterface<E> {
     private int capacity;
     private int head = 0;
     private int tail = 0;
-    private int size ;
+    private int size = 0;
     private Object[] ARRAY;
-
+    private static final int DEFAULT_QUEUE_SIZE = 10;
+    public QueueImplementation() throws QueueAllocationException{
+        this(DEFAULT_QUEUE_SIZE);
+    }
     public QueueImplementation(int capacity) throws QueueAllocationException{
         if(capacity < 2){
             throw new QueueAllocationException("Queue capacity must be at least 2");
         }
         try{//Allocate internal array space
             ARRAY = new Object[capacity];
+            this.capacity = capacity;//Set queue capacity
         }catch(OutOfMemoryError e){
             throw new QueueAllocationException("Failed room for the internal array");
         }
-        this.capacity = capacity;//Set queue capacity
+
     }
     @Override
     public int capacity() {
@@ -65,7 +69,7 @@ public class QueueImplementation<E> implements QueueInterface<E> {
             throw new QueueIsEmptyException("Queue is empty");
         }
 
-        E dequeueElement = (E) ARRAY[head];//Get the element at the front
+        Object dequeueElement = ARRAY[head];//Get the element at the front
         ARRAY[head] = null;//Remove the element by setting its position to null
 
         head = head + 1;//Update the head pointer to the next element position
@@ -74,7 +78,7 @@ public class QueueImplementation<E> implements QueueInterface<E> {
         }//If the capacity is reached, loop it to the beginning of the queue
         size--; //Decrease the size of the queue
 
-        return dequeueElement;
+        return (E) dequeueElement;
     }
     @Override
     public E element() throws QueueIsEmptyException {
